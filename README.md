@@ -6,11 +6,50 @@ A Compose Multiplatform library for rendering a customizable line chart.
 ## Dependency
 Add the dependency to your build.gradle. Replace version with what is available [here](https://central.sonatype.com/artifact/io.github.deanalvero/line-chart-cmp/versions).
 ```
-implementation("io.github.deanalvero:line-chart-cmp:<version>")
+// In your shared module's build.gradle.kts
+commonMain.dependencies {
+    implementation("io.github.deanalvero:line-chart-cmp:<version>")
+}
 ```
 
 ## Usage
-TODO
+### Basic
+```
+import io.github.deanalvero.chart.line.LineChart
+import io.github.deanalvero.chart.line.data.LineData
+import io.github.deanalvero.chart.line.marker.Marker
+import io.github.deanalvero.chart.line.point.Point
+
+@Composable
+fun SimpleLineChart() {
+    val dataPoints = listOf(
+        Point(x = 0f, y = 10f),
+        Point(x = 1f, y = 25f),
+        Point(x = 2f, y = 15f),
+        Point(x = 3f, y = 30f),
+        Point(x = 4f, y = 22f)
+    )
+
+    LineChart(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(300.dp),
+
+        data = listOf(
+            LineData(points = dataPoints, label = "Line 1")
+        ),
+        marker = Marker(
+            content = { markerData ->
+                Text(text = "${markerData.point.x}, ${markerData.point.y}")
+            }
+        ),
+        isInteractable = true
+    )
+}
+```
+
+### Advanced
+Try out the sample app.
 
 ## Sample App
 ### Build and Run Android Application

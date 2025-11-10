@@ -7,8 +7,8 @@ plugins {
     alias(libs.plugins.androidKotlinMultiplatformLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
-//    id("com.vanniktech.maven.publish") version "0.30.0"
-//    signing
+    id("com.vanniktech.maven.publish") version "0.30.0"
+    signing
 }
 
 kotlin {
@@ -123,37 +123,37 @@ kotlin {
     }
 }
 
-//mavenPublishing {
-//    coordinates("io.github.deanalvero", "line-chart-cmp", "0.1.0")
-//
-//    pom {
-//        name.set("Line Chart Compose Multiplatform")
-//        description.set("A Compose Multiplatform library for rendering a customizable line chart.")
-//        url.set("https://github.com/deanalvero/line-chart-cmp")
-//        licenses {
-//            license {
-//                name.set("The Apache License, Version 2.0")
-//                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
-//            }
-//        }
-//        developers {
-//            developer {
-//                id.set("deanalvero")
-//                name.set("Dean Vernon Alvero")
-//                email.set((findProperty("email") as String?).orEmpty())
-//            }
-//        }
-//        scm {
-//            connection.set("scm:git:git://github.com/deanalvero/line-chart-cmp.git")
-//            developerConnection.set("scm:git:ssh://git@github.com:deanalvero/line-chart-cmp.git")
-//            url.set("https://github.com/deanalvero/line-chart-cmp")
-//        }
-//    }
-//
-//    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
-//    signAllPublications()
-//}
-//
-//signing {
-//    useGpgCmd()
-//}
+mavenPublishing {
+    coordinates("io.github.deanalvero", "line-chart-cmp", "0.1.0")
+
+    pom {
+        name.set("Line Chart Compose Multiplatform")
+        description.set("A Compose Multiplatform library for rendering a customizable line chart.")
+        url.set("https://github.com/deanalvero/line-chart-cmp")
+        licenses {
+            license {
+                name.set("The Apache License, Version 2.0")
+                url.set("https://www.apache.org/licenses/LICENSE-2.0.txt")
+            }
+        }
+        developers {
+            developer {
+                id.set("deanalvero")
+                name.set("Dean Vernon Alvero")
+                email.set((findProperty("email") as String?).orEmpty())
+            }
+        }
+        scm {
+            connection.set("scm:git:git://github.com/deanalvero/line-chart-cmp.git")
+            developerConnection.set("scm:git:ssh://git@github.com:deanalvero/line-chart-cmp.git")
+            url.set("https://github.com/deanalvero/line-chart-cmp")
+        }
+    }
+
+    publishToMavenCentral(com.vanniktech.maven.publish.SonatypeHost.CENTRAL_PORTAL)
+    signAllPublications()
+}
+
+signing {
+    useGpgCmd()
+}

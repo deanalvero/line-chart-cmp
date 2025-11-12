@@ -67,10 +67,10 @@ fun LineChart(
 
     BoxWithConstraints(modifier) {
         val paddingPx = with(density) { chartPadding.toPx() }
-        val leftPadding = if (yAxis != null && yAxis.position == YAxisPosition.Left) paddingPx * 3 else paddingPx
-        val rightPadding = if (yAxis != null && yAxis.position == YAxisPosition.Right) paddingPx * 3 else paddingPx
-        val topPadding = if (xAxis != null && xAxis.position == XAxisPosition.Top) paddingPx * 2 else paddingPx
-        val bottomPadding = if (xAxis != null && xAxis.position == XAxisPosition.Bottom) paddingPx * 2 else paddingPx
+        val leftPadding = if (yAxis != null && yAxis.labelPosition == YAxisPosition.Left) paddingPx * 3 else paddingPx
+        val rightPadding = if (yAxis != null && yAxis.labelPosition == YAxisPosition.Right) paddingPx * 3 else paddingPx
+        val topPadding = if (xAxis != null && xAxis.labelPosition == XAxisPosition.Top) paddingPx * 2 else paddingPx
+        val bottomPadding = if (xAxis != null && xAxis.labelPosition == XAxisPosition.Bottom) paddingPx * 2 else paddingPx
 
         val viewport = Rect(
             left = leftPadding,

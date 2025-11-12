@@ -4,8 +4,9 @@ import io.github.deanalvero.chart.line.formatter.AxisValueFormatter
 import io.github.deanalvero.chart.line.formatter.DefaultFormatter
 
 data class XAxis(
-    val position: XAxisPosition = XAxisPosition.Bottom,
+    val axisLinePosition: XAxisPosition = XAxisPosition.Bottom,
     val style: AxisStyle = AxisStyle(),
+    val labelPosition: XAxisPosition = XAxisPosition.Bottom,
     val labelStyle: LabelStyle = LabelStyle(),
     val labelCount: Int = 5,
     val valueFormatter: AxisValueFormatter = DefaultFormatter,

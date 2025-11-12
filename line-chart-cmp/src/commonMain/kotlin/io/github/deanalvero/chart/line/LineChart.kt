@@ -50,7 +50,6 @@ fun LineChart(
     gridLines: GridLines = GridLines(),
     marker: Marker? = null,
     chartPadding: Dp = 16.dp,
-    isInteractable: Boolean = true,
     onSelectionChange: (SelectionInfo) -> Unit = {}
 ) {
     if (data.isEmpty() || data.all { it.points.isEmpty() }) {
@@ -68,10 +67,10 @@ fun LineChart(
 
     BoxWithConstraints(modifier) {
         val paddingPx = with(density) { chartPadding.toPx() }
-        val leftPadding = if (yAxis != null && yAxis.position == YAxisPosition.Left) paddingPx * 3 else paddingPx
-        val rightPadding = if (yAxis != null && yAxis.position == YAxisPosition.Right) paddingPx * 3 else paddingPx
-        val topPadding = if (xAxis != null && xAxis.position == XAxisPosition.Top) paddingPx * 2 else paddingPx
-        val bottomPadding = if (xAxis != null && xAxis.position == XAxisPosition.Bottom) paddingPx * 2 else paddingPx
+        val leftPadding = if (yAxis != null && yAxis.labelPosition == YAxisPosition.Left) paddingPx * 3 else paddingPx
+        val rightPadding = if (yAxis != null && yAxis.labelPosition == YAxisPosition.Right) paddingPx * 3 else paddingPx
+        val topPadding = if (xAxis != null && xAxis.labelPosition == XAxisPosition.Top) paddingPx * 2 else paddingPx
+        val bottomPadding = if (xAxis != null && xAxis.labelPosition == XAxisPosition.Bottom) paddingPx * 2 else paddingPx
 
         val viewport = Rect(
             left = leftPadding,
@@ -88,7 +87,7 @@ fun LineChart(
             Modifier
                 .fillMaxSize()
                 .then(
-                    if (isInteractable) {
+                    if (marker != null) {
                         Modifier.pointerInput(data, transformer) {
                             detectDragGestures(
                                 onDragStart = { offset ->

@@ -13,7 +13,6 @@ import io.github.deanalvero.chart.line.axis.YAxisPosition
 import io.github.deanalvero.chart.line.grid.GridLines
 import io.github.deanalvero.chart.line.data.LineData
 import io.github.deanalvero.chart.line.point.Point
-import io.github.deanalvero.chart.line.point.PointStyle
 import io.github.deanalvero.chart.line.transformer.DataTransformer
 import kotlin.math.max
 
@@ -70,7 +69,7 @@ fun DrawScope.drawXAxis(
     val labelStyle = axis.labelStyle.textStyle.copy(color = axis.labelStyle.color)
     val labelCount = max(2, axis.labelCount)
 
-    val y = if (axis.position == XAxisPosition.Bottom) viewport.bottom else viewport.top
+    val y = if (axis.axisLinePosition == XAxisPosition.Bottom) viewport.bottom else viewport.top
     drawLine(
         color = axis.style.color,
         start = Offset(viewport.left, y),
@@ -85,7 +84,7 @@ fun DrawScope.drawXAxis(
         val label = axis.valueFormatter.format(x)
         val text = textMeasurer.measure(label, labelStyle)
         val posX = transformer.dataToOffset(Point(x, bounds.top)).x - text.size.width / 2
-        val labelY = if (axis.position == XAxisPosition.Bottom)
+        val labelY = if (axis.labelPosition == XAxisPosition.Bottom)
             viewport.bottom + 4.dp.toPx()
         else viewport.top - text.size.height - 4.dp.toPx()
         drawText(text, topLeft = Offset(posX, labelY))
@@ -106,7 +105,7 @@ fun DrawScope.drawYAxis(
     val labelStyle = axis.labelStyle.textStyle.copy(color = axis.labelStyle.color)
     val labelCount = max(2, axis.labelCount)
 
-    val x = if (axis.position == YAxisPosition.Left) viewport.left else viewport.right
+    val x = if (axis.axisLinePosition == YAxisPosition.Left) viewport.left else viewport.right
     drawLine(
         color = axis.style.color,
         start = Offset(x, viewport.top),
@@ -121,7 +120,7 @@ fun DrawScope.drawYAxis(
         val label = axis.valueFormatter.format(y)
         val text = textMeasurer.measure(label, labelStyle)
         val posY = transformer.dataToOffset(Point(bounds.left, y)).y - text.size.height / 2
-        val labelX = if (axis.position == YAxisPosition.Left)
+        val labelX = if (axis.labelPosition == YAxisPosition.Left)
             viewport.left - text.size.width - 6.dp.toPx()
         else viewport.right + 6.dp.toPx()
         drawText(text, topLeft = Offset(labelX, posY))

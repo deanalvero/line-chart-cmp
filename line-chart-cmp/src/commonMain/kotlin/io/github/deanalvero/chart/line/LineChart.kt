@@ -50,7 +50,6 @@ fun LineChart(
     gridLines: GridLines = GridLines(),
     marker: Marker? = null,
     chartPadding: Dp = 16.dp,
-    isInteractable: Boolean = true,
     onSelectionChange: (SelectionInfo) -> Unit = {}
 ) {
     if (data.isEmpty() || data.all { it.points.isEmpty() }) {
@@ -88,7 +87,7 @@ fun LineChart(
             Modifier
                 .fillMaxSize()
                 .then(
-                    if (isInteractable) {
+                    if (marker != null) {
                         Modifier.pointerInput(data, transformer) {
                             detectDragGestures(
                                 onDragStart = { offset ->

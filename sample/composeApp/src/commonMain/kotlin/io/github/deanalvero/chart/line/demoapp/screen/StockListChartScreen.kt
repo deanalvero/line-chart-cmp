@@ -88,8 +88,7 @@ fun StockListChartScreen() {
                             ),
                             xAxis = null,
                             yAxis = null,
-                            marker = null,
-                            isInteractable = false
+                            marker = null
                         )
 
                         Column(

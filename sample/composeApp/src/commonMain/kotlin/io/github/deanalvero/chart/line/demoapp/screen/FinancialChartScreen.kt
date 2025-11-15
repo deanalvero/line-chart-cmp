@@ -70,7 +70,7 @@ fun FinancialChartScreen() {
     val lineData = LineData(
         points = stockData,
         label = "AAPL",
-        defaultSegmentStyle = SegmentStyle(
+        segmentStyle = SegmentStyle(
             color = if (stockData.last().y > stockData.first().y) Color(0xFF4CAF50) else Color(0xFFF44336),
             strokeWidth = 3.dp
         )

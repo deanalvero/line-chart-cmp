@@ -80,7 +80,7 @@ fun StockListChartScreen() {
                                 LineData(
                                     points = data,
                                     label = ticker,
-                                    defaultSegmentStyle = SegmentStyle(
+                                    segmentStyle = SegmentStyle(
                                         color = if (change >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
                                         strokeWidth = 2.dp
                                     )

@@ -38,7 +38,7 @@ fun BasicChartScreen() {
     val lineData = LineData(
         points = points,
         label = "Sample Data",
-        defaultSegmentStyle = SegmentStyle(
+        segmentStyle = SegmentStyle(
             color = Color(0xFF2196F3),
             strokeWidth = 3.dp
         )

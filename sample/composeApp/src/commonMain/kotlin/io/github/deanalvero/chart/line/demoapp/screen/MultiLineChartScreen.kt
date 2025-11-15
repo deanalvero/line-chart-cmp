@@ -58,7 +58,7 @@ fun MultiLineChartScreen() {
         LineData(
             points = series1,
             label = "Product A",
-            defaultSegmentStyle = SegmentStyle(
+            segmentStyle = SegmentStyle(
                 color = Color(0xFF2196F3),
                 strokeWidth = 3.dp
             )
@@ -66,7 +66,7 @@ fun MultiLineChartScreen() {
         LineData(
             points = series2,
             label = "Product B",
-            defaultSegmentStyle = SegmentStyle(
+            segmentStyle = SegmentStyle(
                 color = Color(0xFF4CAF50),
                 strokeWidth = 3.dp
             )
@@ -74,7 +74,7 @@ fun MultiLineChartScreen() {
         LineData(
             points = series3,
             label = "Product C",
-            defaultSegmentStyle = SegmentStyle(
+            segmentStyle = SegmentStyle(
                 color = Color(0xFFFF9800),
                 strokeWidth = 3.dp
             )
@@ -139,7 +139,7 @@ fun MultiLineChartScreen() {
                         modifier = Modifier
                             .size(12.dp)
                             .background(
-                                line.defaultSegmentStyle.color,
+                                line.segmentStyle.color,
                                 RoundedCornerShape(2.dp)
                             )
                     )

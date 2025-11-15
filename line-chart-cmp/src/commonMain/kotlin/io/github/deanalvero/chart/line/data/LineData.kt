@@ -6,6 +6,6 @@ import io.github.deanalvero.chart.line.segment.SegmentStyle
 data class LineData(
     val points: List<Point>,
     val label: String,
-    val defaultSegmentStyle: SegmentStyle = SegmentStyle(),
-    val segmentOverrides: List<SegmentStyle?> = emptyList()
+    val segmentStyle: SegmentStyle = SegmentStyle(),
+    val interpolation: LineInterpolation = LineInterpolation.Linear
 )

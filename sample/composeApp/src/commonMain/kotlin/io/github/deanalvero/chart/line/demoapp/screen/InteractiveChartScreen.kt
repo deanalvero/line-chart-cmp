@@ -42,7 +42,7 @@ fun InteractiveChartScreen() {
     val lineData = LineData(
         points = points,
         label = "Temperature",
-        defaultSegmentStyle = SegmentStyle(
+        segmentStyle = SegmentStyle(
             color = Color(0xFFFF5722),
             strokeWidth = 3.dp
         )

@@ -2,7 +2,11 @@ package io.github.deanalvero.chart.line.utils
 
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.unit.dp
@@ -12,6 +16,7 @@ import io.github.deanalvero.chart.line.axis.YAxis
 import io.github.deanalvero.chart.line.axis.YAxisPosition
 import io.github.deanalvero.chart.line.grid.GridLines
 import io.github.deanalvero.chart.line.data.LineData
+import io.github.deanalvero.chart.line.data.LineInterpolation
 import io.github.deanalvero.chart.line.point.Point
 import io.github.deanalvero.chart.line.transformer.DataTransformer
 import kotlin.math.max
@@ -128,22 +133,94 @@ fun DrawScope.drawYAxis(
 }
 
 fun DrawScope.drawLineSeries(line: LineData, transformer: DataTransformer) {
-    for (i in 0 until line.points.lastIndex) {
-        val start = transformer.dataToOffset(line.points[i])
-        val end = transformer.dataToOffset(line.points[i + 1])
-        val style = line.segmentOverrides.getOrNull(i) ?: line.defaultSegmentStyle
-        drawLine(
-            color = style.color,
-            start = start,
-            end = end,
-            strokeWidth = style.strokeWidth.toPx(),
+    val offsets = line.points.map { transformer.dataToOffset(it) }
+    if (offsets.size < 2) return
+
+    val path = buildPath(offsets, line.interpolation)
+
+    val style = line.segmentStyle
+
+    drawPath(
+        path = path,
+        color = style.color,
+        style = Stroke(
+            width = style.strokeWidth.toPx(),
+            cap = StrokeCap.Round,
+            join = StrokeJoin.Round,
             pathEffect = style.pathEffect
         )
-    }
+    )
 
     line.points.forEach { point ->
         point.style?.let { style ->
             style.drawer.run { drawPoint(transformer.dataToOffset(point), style) }
         }
     }
+}
+
+private fun buildPath(points: List<Offset>, interpolation: LineInterpolation): Path {
+    val path = Path()
+    if (points.isEmpty()) return path
+
+    path.moveTo(points.first().x, points.first().y)
+
+    when (interpolation) {
+
+        LineInterpolation.Linear -> {
+            for (i in 1 until points.size) {
+                path.lineTo(points[i].x, points[i].y)
+            }
+        }
+
+        LineInterpolation.Step -> {
+            for (i in 1 until points.size) {
+                val prev = points[i - 1]
+                val cur = points[i]
+                path.lineTo(cur.x, prev.y)
+                path.lineTo(cur.x, cur.y)
+            }
+        }
+
+        LineInterpolation.Quadratic -> {
+            for (i in 1 until points.size) {
+                val p0 = points[i - 1]
+                val p1 = points[i]
+                val mid = Offset((p0.x + p1.x) / 2f, (p0.y + p1.y) / 2f)
+                path.quadraticBezierTo(p0.x, p0.y, mid.x, mid.y)
+                path.quadraticBezierTo(p1.x, p1.y, p1.x, p1.y)
+            }
+        }
+
+        LineInterpolation.Cubic -> {
+            if (points.size < 3) {
+                for (i in 1 until points.size) path.lineTo(points[i].x, points[i].y)
+                return path
+            }
+
+            val ext = listOf(points.first()) + points + listOf(points.last())
+
+            for (i in 1 until ext.size - 2) {
+                val p0 = ext[i - 1]
+                val p1 = ext[i]
+                val p2 = ext[i + 1]
+                val p3 = ext[i + 2]
+
+                val cp1 = Offset(
+                    p1.x + (p2.x - p0.x) / 6f,
+                    p1.y + (p2.y - p0.y) / 6f,
+                )
+                val cp2 = Offset(
+                    p2.x - (p3.x - p1.x) / 6f,
+                    p2.y - (p3.y - p1.y) / 6f,
+                )
+                path.cubicTo(
+                    cp1.x, cp1.y,
+                    cp2.x, cp2.y,
+                    p2.x, p2.y
+                )
+            }
+        }
+    }
+
+    return path
 }

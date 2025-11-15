@@ -28,7 +28,7 @@ import io.github.deanalvero.chart.line.demoapp.screen.InteractiveChartScreen
 import io.github.deanalvero.chart.line.demoapp.screen.MultiLineChartScreen
 import io.github.deanalvero.chart.line.demoapp.screen.Screen
 import io.github.deanalvero.chart.line.demoapp.screen.StockListChartScreen
-import io.github.deanalvero.chart.line.demoapp.screen.StyledChartScreen
+import io.github.deanalvero.chart.line.demoapp.screen.StyledMultiLineChartScreen
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -71,7 +71,7 @@ fun LineChartDemoApp() {
                         Screen.Home -> HomeScreen { currentScreen = it }
                         Screen.BasicChart -> BasicChartScreen()
                         Screen.MultiLine -> MultiLineChartScreen()
-                        Screen.StyledChart -> StyledChartScreen()
+                        Screen.StyledChart -> StyledMultiLineChartScreen()
                         Screen.InteractiveChart -> InteractiveChartScreen()
                         Screen.FinancialChart -> FinancialChartScreen()
                         Screen.StockListChart -> StockListChartScreen()

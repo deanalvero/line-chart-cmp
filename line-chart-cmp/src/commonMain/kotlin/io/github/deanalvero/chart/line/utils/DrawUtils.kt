@@ -6,6 +6,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.drawText
@@ -136,12 +137,23 @@ fun DrawScope.drawLineSeries(line: LineData, transformer: DataTransformer) {
     val offsets = line.points.map { transformer.dataToOffset(it) }
     if (offsets.size < 2) return
 
-    val path = buildPath(offsets, line.interpolation)
+    val linePath = buildLinePath(offsets, line.interpolation)
+
+    line.fillColor?.let {
+        val viewportBottom = transformer.viewport.bottom
+        val area = buildAreaPath(linePath, offsets, viewportBottom)
+
+        drawPath(
+            path = area,
+            color = it,
+            style = Fill
+        )
+    }
 
     val style = line.segmentStyle
 
     drawPath(
-        path = path,
+        path = linePath,
         color = style.color,
         style = Stroke(
             width = style.strokeWidth.toPx(),
@@ -158,7 +170,7 @@ fun DrawScope.drawLineSeries(line: LineData, transformer: DataTransformer) {
     }
 }
 
-private fun buildPath(points: List<Offset>, interpolation: LineInterpolation): Path {
+private fun buildLinePath(points: List<Offset>, interpolation: LineInterpolation): Path {
     val path = Path()
     if (points.isEmpty()) return path
 
@@ -223,4 +235,17 @@ private fun buildPath(points: List<Offset>, interpolation: LineInterpolation): P
     }
 
     return path
+}
+
+private fun buildAreaPath(topPath: Path, points: List<Offset>, viewportBottom: Float): Path {
+    val area = Path()
+    area.addPath(topPath)
+    if (points.isNotEmpty()) {
+        val first = points.first()
+        val last = points.last()
+        area.lineTo(last.x, viewportBottom)
+        area.lineTo(first.x, viewportBottom)
+        area.close()
+    }
+    return area
 }

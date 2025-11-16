@@ -4,7 +4,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import io.github.deanalvero.chart.line.point.Point
 
-class DataTransformer(private val bounds: Rect, private val viewport: Rect) {
+class DataTransformer(private val bounds: Rect, val viewport: Rect) {
     private val xRange = bounds.width.coerceAtLeast(0.001f)
     private val yRange = bounds.height.coerceAtLeast(0.001f)
 

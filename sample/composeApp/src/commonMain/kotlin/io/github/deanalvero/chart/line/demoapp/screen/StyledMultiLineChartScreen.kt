@@ -51,7 +51,8 @@ fun StyledMultiLineChartScreen() {
                 strokeWidth = 3.dp,
                 pathEffect = PathEffect.dashPathEffect(floatArrayOf(10f, 10f))
             ),
-            interpolation = LineInterpolation.Linear
+            interpolation = LineInterpolation.Linear,
+            fillColor = Color(0x33FF9800)
         )
     }
 
@@ -89,7 +90,8 @@ fun StyledMultiLineChartScreen() {
                 strokeWidth = 5.dp,
                 pathEffect = null
             ),
-            interpolation = LineInterpolation.Cubic
+            interpolation = LineInterpolation.Cubic,
+            fillColor = Color(0x339900FF)
         )
     }
 

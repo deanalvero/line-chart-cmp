@@ -16,10 +16,34 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.math.roundToInt
 
-fun calculateBounds(data: List<LineData>, xAxis: XAxis?, yAxis: YAxis?): Rect {
+fun calculateBounds(data: List<LineData>, xAxis: XAxis?, yAxis: YAxis?, isStacked: Boolean): Rect {
     if (data.isEmpty() || data.all { it.points.isEmpty() }) {
         return Rect(0f, 0f, 1f, 1f)
     }
+
+    if (isStacked) {
+        val (stackedTop, _) = computeStackedSeries(data.map { it.points })
+        val topSeries = stackedTop.last()
+
+        val xs = topSeries.map { it.x }
+        val ys = topSeries.map { it.y }
+
+        var minX = xs.min()
+        var maxX = xs.max()
+
+        val minY = 0f
+        var maxY = ys.max()
+
+        if (minX == maxX) { minX -= 1f; maxX += 1f }
+        if (maxY == minY) { maxY += 1f }
+
+        val finalMinX = (xAxis?.min as? AxisValue.Fixed)?.value ?: minX
+        val finalMaxX = (xAxis?.max as? AxisValue.Fixed)?.value ?: maxX
+        val finalMinY = (yAxis?.min as? AxisValue.Fixed)?.value ?: minY
+        val finalMaxY = (yAxis?.max as? AxisValue.Fixed)?.value ?: maxY
+        return Rect(finalMinX, finalMinY, finalMaxX, finalMaxY)
+    }
+
 
     var minX = Float.MAX_VALUE
     var maxX = Float.MIN_VALUE
@@ -101,4 +125,48 @@ fun calculateMarkerOffset(
     }
 
     return IntOffset(finalX.roundToInt(), finalY.roundToInt())
+}
+
+fun computeStackedSeries(series: List<List<Point>>): Pair<List<List<Point>>, List<List<Point>>> {
+    if (series.isEmpty()) return Pair(emptyList(), emptyList())
+
+    val nSeries = series.size
+    val nX = series[0].size
+
+    val xs = series[0].map { it.x }
+
+    series.forEachIndexed { si, pts ->
+        require(pts.size == nX) { "All series must have same x size" }
+        for (i in 0 until nX) {
+            require(pts[i].x == xs[i]) { "All series must have same x positions" }
+        }
+    }
+
+    val values = Array(nSeries) { FloatArray(nX) }
+    for (s in 0 until nSeries)
+        for (i in 0 until nX)
+            values[s][i] = series[s][i].y
+
+    val stacked = Array(nSeries) { FloatArray(nX) }
+
+    for (i in 0 until nX) {
+        var acc = 0f
+        for (s in 0 until nSeries) {
+            acc += values[s][i]
+            stacked[s][i] = acc
+        }
+    }
+
+    val topPoints = (0 until nSeries).map { s ->
+        (0 until nX).map { i -> Point(xs[i], stacked[s][i]) }
+    }
+
+    val basePoints = (0 until nSeries).map { s ->
+        (0 until nX).map { i ->
+            val baseY = if (s == 0) 0f else stacked[s - 1][i]
+            Point(xs[i], baseY)
+        }
+    }
+
+    return topPoints to basePoints
 }

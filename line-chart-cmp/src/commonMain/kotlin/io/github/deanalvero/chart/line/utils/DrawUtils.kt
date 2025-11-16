@@ -140,8 +140,15 @@ fun DrawScope.drawLineSeries(line: LineData, transformer: DataTransformer) {
     val linePath = buildLinePath(offsets, line.interpolation)
 
     line.fillColor?.let {
-        val viewportBottom = transformer.viewport.bottom
-        val area = buildAreaPath(linePath, offsets, viewportBottom)
+        val baseline = List(offsets.size) { i ->
+            Offset(offsets[i].x, transformer.viewport.bottom)
+        }
+
+        val area = buildAreaPath(
+            topPoints = offsets,
+            basePoints = baseline,
+            interpolation = line.interpolation
+        )
 
         drawPath(
             path = area,
@@ -166,6 +173,50 @@ fun DrawScope.drawLineSeries(line: LineData, transformer: DataTransformer) {
     line.points.forEach { point ->
         point.style?.let { style ->
             style.drawer.run { drawPoint(transformer.dataToOffset(point), style) }
+        }
+    }
+}
+
+fun DrawScope.drawLineSeriesList(
+    data: List<LineData>,
+    transformer: DataTransformer,
+    isStacked: Boolean
+) {
+    if (!isStacked) {
+        data.forEach { drawLineSeries(it, transformer) }
+        return
+    }
+
+    val seriesPoints = data.map { it.points }
+    val (stackedTop, stackedBase) = computeStackedSeries(seriesPoints)
+
+    data.forEachIndexed { index, series ->
+        val topOffsets = stackedTop[index].map { transformer.dataToOffset(it) }
+        val baseOffsets = stackedBase[index].map { transformer.dataToOffset(it) }
+
+        val topPath = buildLinePath(topOffsets, series.interpolation)
+        val area = buildAreaPath(topOffsets, baseOffsets, series.interpolation)
+
+        if (series.fillColor != null) {
+            drawPath(area, color = series.fillColor, style = Fill)
+        }
+
+        val style = series.segmentStyle
+        drawPath(
+            path = topPath,
+            color = style.color,
+            style = Stroke(
+                width = style.strokeWidth.toPx(),
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round,
+                pathEffect = style.pathEffect
+            )
+        )
+
+        series.points.forEachIndexed { i, pt ->
+            pt.style?.let { st ->
+                st.drawer.run { drawPoint(topOffsets[i], st) }
+            }
         }
     }
 }
@@ -233,19 +284,71 @@ private fun buildLinePath(points: List<Offset>, interpolation: LineInterpolation
             }
         }
     }
-
     return path
 }
 
-private fun buildAreaPath(topPath: Path, points: List<Offset>, viewportBottom: Float): Path {
-    val area = Path()
-    area.addPath(topPath)
-    if (points.isNotEmpty()) {
-        val first = points.first()
-        val last = points.last()
-        area.lineTo(last.x, viewportBottom)
-        area.lineTo(first.x, viewportBottom)
-        area.close()
+private fun appendInterpolatedPath(
+    path: Path,
+    points: List<Offset>,
+    interpolation: LineInterpolation
+) {
+    if (points.isEmpty()) return
+
+    when (interpolation) {
+        LineInterpolation.Linear -> {
+            for (i in 1 until points.size) path.lineTo(points[i].x, points[i].y)
+        }
+        LineInterpolation.Step -> {
+            for (i in 1 until points.size) {
+                val prev = points[i - 1]; val cur = points[i]
+                path.lineTo(cur.x, prev.y)
+                path.lineTo(cur.x, cur.y)
+            }
+        }
+        LineInterpolation.Quadratic -> {
+            for (i in 1 until points.size) {
+                val p0 = points[i - 1]; val p1 = points[i]
+                val mid = Offset((p0.x + p1.x) / 2f, (p0.y + p1.y) / 2f)
+                path.quadraticTo(p0.x, p0.y, mid.x, mid.y)
+                path.quadraticTo(p1.x, p1.y, p1.x, p1.y)
+            }
+        }
+        LineInterpolation.Cubic -> {
+            if (points.size < 3) {
+                for (i in 1 until points.size) path.lineTo(points[i].x, points[i].y)
+                return
+            }
+            val ext = listOf(points.first()) + points + listOf(points.last())
+            for (i in 1 until ext.size - 2) {
+                val p0 = ext[i - 1]; val p1 = ext[i]; val p2 = ext[i + 1]; val p3 = ext[i + 2]
+                val cp1x = p1.x + (p2.x - p0.x) / 6f
+                val cp1y = p1.y + (p2.y - p0.y) / 6f
+                val cp2x = p2.x - (p3.x - p1.x) / 6f
+                val cp2y = p2.y - (p3.y - p1.y) / 6f
+                path.cubicTo(cp1x, cp1y, cp2x, cp2y, p2.x, p2.y)
+            }
+        }
     }
-    return area
+}
+
+private fun buildAreaPath(
+    topPoints: List<Offset>,
+    basePoints: List<Offset>,
+    interpolation: LineInterpolation
+): Path {
+    val path = Path()
+    if (topPoints.isEmpty() || basePoints.isEmpty()) return path
+    require(topPoints.size == basePoints.size) { "Top and base must have same point count" }
+
+    path.moveTo(topPoints.first().x, topPoints.first().y)
+
+    appendInterpolatedPath(path, topPoints, interpolation)
+
+    val lastBase = basePoints.last()
+    path.lineTo(lastBase.x, lastBase.y)
+
+    appendInterpolatedPath(path, basePoints.asReversed(), interpolation)
+
+    path.close()
+    return path
 }

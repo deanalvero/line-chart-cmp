@@ -71,7 +71,8 @@ fun StyledMultiLineChartScreen() {
                 strokeWidth = 4.dp,
                 pathEffect = PathEffect.dashPathEffect(floatArrayOf(4f, 12f))
             ),
-            interpolation = LineInterpolation.Quadratic
+            interpolation = LineInterpolation.Quadratic,
+            fillColor = Color(0xFF0000FF)
         )
     }
 
@@ -103,7 +104,7 @@ fun StyledMultiLineChartScreen() {
             .padding(16.dp)
     ) {
         Text(
-            "Styled Multi-Line Chart",
+            "Styled Stacked Multi-Line Chart",
             style = MaterialTheme.typography.headlineSmall,
             color = Color.White,
             modifier = Modifier.padding(bottom = 8.dp)
@@ -146,7 +147,8 @@ fun StyledMultiLineChartScreen() {
                         strokeWidth = 1.dp,
                         pathEffect = null
                     )
-                )
+                ),
+                isStacked = true
             )
         }
 

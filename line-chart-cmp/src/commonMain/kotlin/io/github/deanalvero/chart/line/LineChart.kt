@@ -36,6 +36,7 @@ import io.github.deanalvero.chart.line.utils.calculateBounds
 import io.github.deanalvero.chart.line.utils.calculateMarkerOffset
 import io.github.deanalvero.chart.line.utils.drawGridLines
 import io.github.deanalvero.chart.line.utils.drawLineSeries
+import io.github.deanalvero.chart.line.utils.drawLineSeriesList
 import io.github.deanalvero.chart.line.utils.drawXAxis
 import io.github.deanalvero.chart.line.utils.drawYAxis
 import io.github.deanalvero.chart.line.utils.findClosest
@@ -48,6 +49,7 @@ fun LineChart(
     xAxis: XAxis? = XAxis(),
     yAxis: YAxis? = YAxis(),
     gridLines: GridLines = GridLines(),
+    isStacked: Boolean = false,
     marker: Marker? = null,
     chartPadding: Dp = 16.dp,
     onSelectionChange: (SelectionInfo) -> Unit = {}
@@ -59,8 +61,8 @@ fun LineChart(
 
     val density = LocalDensity.current
     val textMeasurer = rememberTextMeasurer()
-    val bounds = remember(data, xAxis, yAxis) {
-        calculateBounds(data, xAxis, yAxis)
+    val bounds = remember(data, xAxis, yAxis, isStacked) {
+        calculateBounds(data, xAxis, yAxis, isStacked)
     }
     var selectionState by remember { mutableStateOf<SelectionState?>(null) }
     val markerSizes = remember { mutableStateMapOf<Int, IntSize>() }
@@ -133,7 +135,11 @@ fun LineChart(
             drawGridLines(gridLines, viewport, bounds, xAxis, yAxis, transformer)
             drawXAxis(xAxis, viewport, bounds, transformer, textMeasurer)
             drawYAxis(yAxis, viewport, bounds, transformer, textMeasurer)
-            data.forEach { drawLineSeries(it, transformer) }
+            drawLineSeriesList(
+                data = data,
+                transformer = transformer,
+                isStacked = isStacked
+            )
 
             selectionState?.let { state ->
                 if (state.markerData.isNotEmpty() && marker != null) {

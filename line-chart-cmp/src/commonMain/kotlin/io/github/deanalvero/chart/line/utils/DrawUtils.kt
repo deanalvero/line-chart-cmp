@@ -183,27 +183,37 @@ fun DrawScope.drawLineSeriesList(
     isStacked: Boolean
 ) {
     if (!isStacked) {
-        data.forEach { drawLineSeries(it, transformer) }
+        drawAllFills(data, transformer)
+        drawAllLines(data, transformer)
+        drawAllPoints(data, transformer)
         return
     }
 
     val seriesPoints = data.map { it.points }
     val (stackedTop, stackedBase) = computeStackedSeries(seriesPoints)
+    drawAllStackedFills(data, transformer, stackedTop, stackedBase)
+    drawAllStackedLines(data, transformer, stackedTop)
+    drawAllStackedPoints(data, transformer, stackedTop)
+}
 
-    data.forEachIndexed { index, series ->
-        val topOffsets = stackedTop[index].map { transformer.dataToOffset(it) }
-        val baseOffsets = stackedBase[index].map { transformer.dataToOffset(it) }
-
-        val topPath = buildLinePath(topOffsets, series.interpolation)
-        val area = buildAreaPath(topOffsets, baseOffsets, series.interpolation)
-
+private fun DrawScope.drawAllFills(data: List<LineData>, transformer: DataTransformer) {
+    data.forEach { series ->
+        val offsets = series.points.map { transformer.dataToOffset(it) }
         if (series.fillColor != null) {
+            val baseline = offsets.map { Offset(it.x, transformer.viewport.bottom) }
+            val area = buildAreaPath(offsets, baseline, series.interpolation)
             drawPath(area, color = series.fillColor, style = Fill)
         }
+    }
+}
 
+private fun DrawScope.drawAllLines(data: List<LineData>, transformer: DataTransformer) {
+    data.forEach { series ->
+        val offsets = series.points.map { transformer.dataToOffset(it) }
+        val path = buildLinePath(offsets, series.interpolation)
         val style = series.segmentStyle
         drawPath(
-            path = topPath,
+            path = path,
             color = style.color,
             style = Stroke(
                 width = style.strokeWidth.toPx(),
@@ -212,10 +222,88 @@ fun DrawScope.drawLineSeriesList(
                 pathEffect = style.pathEffect
             )
         )
+    }
+}
 
-        series.points.forEachIndexed { i, pt ->
-            pt.style?.let { st ->
-                st.drawer.run { drawPoint(topOffsets[i], st) }
+private fun DrawScope.drawAllPoints(data: List<LineData>, transformer: DataTransformer) {
+    data.forEach { series ->
+        series.points.forEach { point ->
+            point.style?.let { st ->
+                val pos = transformer.dataToOffset(point)
+                st.drawer.run {
+                    drawPoint(pos, st)
+                }
+            }
+        }
+    }
+}
+
+fun DrawScope.drawAllStackedFills(
+    data: List<LineData>,
+    transformer: DataTransformer,
+    stackedTop: List<List<Point>>,
+    stackedBase: List<List<Point>>
+) {
+    data.forEachIndexed { index, series ->
+        val fillColor = series.fillColor ?: return@forEachIndexed
+
+        val topOffsets = stackedTop[index].map { transformer.dataToOffset(it) }
+        val baseOffsets = stackedBase[index].map { transformer.dataToOffset(it) }
+
+        val area = buildAreaPath(
+            topPoints = topOffsets,
+            basePoints = baseOffsets,
+            interpolation = series.interpolation
+        )
+
+        drawPath(
+            path = area,
+            color = fillColor,
+            style = Fill
+        )
+    }
+}
+
+fun DrawScope.drawAllStackedLines(
+    data: List<LineData>,
+    transformer: DataTransformer,
+    stackedTop: List<List<Point>>
+) {
+    data.forEachIndexed { index, series ->
+        val topOffsets = stackedTop[index].map { transformer.dataToOffset(it) }
+        val path = buildLinePath(topOffsets, series.interpolation)
+
+        val style = series.segmentStyle
+
+        drawPath(
+            path = path,
+            color = style.color,
+            style = Stroke(
+                width = style.strokeWidth.toPx(),
+                cap = StrokeCap.Round,
+                join = StrokeJoin.Round,
+                pathEffect = style.pathEffect
+            )
+        )
+    }
+}
+
+fun DrawScope.drawAllStackedPoints(
+    data: List<LineData>,
+    transformer: DataTransformer,
+    stackedTop: List<List<Point>>
+) {
+    data.forEachIndexed { index, series ->
+        val topOffsets = stackedTop[index].map { transformer.dataToOffset(it) }
+
+        series.points.forEachIndexed { i, point ->
+            point.style?.let { style ->
+                style.drawer.run {
+                    drawPoint(
+                        center = topOffsets[i],
+                        style = style
+                    )
+                }
             }
         }
     }

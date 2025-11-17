@@ -85,6 +85,7 @@ fun InteractiveChartScreen() {
                     labelCount = 7,
                     valueFormatter = { "${it.toInt()}h" }
                 ),
+                isSelectionEnabled = true,
                 yAxis = YAxis(
                     labelCount = 5,
                     valueFormatter = { "${it.toInt()}°C" }

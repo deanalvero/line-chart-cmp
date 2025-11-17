@@ -50,6 +50,7 @@ fun LineChart(
     yAxis: YAxis? = YAxis(),
     gridLines: GridLines = GridLines(),
     isStacked: Boolean = false,
+    isSelectionEnabled: Boolean = false,
     marker: Marker? = null,
     chartPadding: Dp = 16.dp,
     onSelectionChange: (SelectionInfo) -> Unit = {}
@@ -89,7 +90,7 @@ fun LineChart(
             Modifier
                 .fillMaxSize()
                 .then(
-                    if (marker != null) {
+                    if (isSelectionEnabled) {
                         Modifier.pointerInput(data, transformer) {
                             detectDragGestures(
                                 onDragStart = { offset ->

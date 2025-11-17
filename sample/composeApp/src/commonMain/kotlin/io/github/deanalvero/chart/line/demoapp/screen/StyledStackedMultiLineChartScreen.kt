@@ -13,6 +13,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,6 +35,7 @@ import io.github.deanalvero.chart.line.point.Point
 import io.github.deanalvero.chart.line.point.PointStyle
 import io.github.deanalvero.chart.line.point.SquarePointDrawer
 import io.github.deanalvero.chart.line.segment.SegmentStyle
+import io.github.deanalvero.chart.line.selection.SelectionInfo
 
 @Composable
 fun StyledMultiLineChartScreen() {
@@ -97,7 +100,7 @@ fun StyledMultiLineChartScreen() {
     }
 
     val allLines = listOf(lineA, lineB, lineC)
-
+    val selectionInfo = remember { mutableStateOf<SelectionInfo?>(null) }
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -148,36 +151,61 @@ fun StyledMultiLineChartScreen() {
                         pathEffect = null
                     )
                 ),
-                isStacked = true
+                isStacked = true,
+                isSelectionEnabled = true,
+                onSelectionChange = {
+                    selectionInfo.value = it
+                }
             )
         }
 
         Spacer(modifier = Modifier.height(16.dp))
-
-        Text(
-            "Legend:",
-            color = Color.White,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(8.dp))
-
-        Column(Modifier.fillMaxWidth()) {
-            LegendRow("Linear Dashed", Color(0xFFE91E63))
-            LegendRow("Quadratic Dotted", Color(0xFF00BCD4))
-            LegendRow("Cubic Smooth", Color(0xFFFF9800))
-        }
+        CustomLegend(allLines, selectionInfo)
     }
 }
 
 @Composable
-private fun LegendRow(name: String, color: Color) {
+private fun CustomLegend(allLines: List<LineData>, selectionInfo: MutableState<SelectionInfo?>) {
+    Text(
+        "Legend:",
+        color = Color.White,
+        fontWeight = FontWeight.Bold
+    )
+    Spacer(modifier = Modifier.height(8.dp))
+
+    allLines.forEachIndexed { index, line ->
+        val selectedY = selectionInfo.value
+            ?.selectedData
+            ?.getOrNull(index)
+            ?.point
+            ?.y
+
+        val yValue = selectedY ?: line.points.last().y
+
+        LegendRow(
+            name = line.label,
+            color = line.segmentStyle.color,
+            value = yValue
+        )
+    }
+}
+
+@Composable
+private fun LegendRow(name: String, color: Color, value: Float) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Text(name, color = Color.Gray)
-        Text("■", color = color)
+        Row {
+            Text("■ ", color = color)
+            Text(name, color = Color.Gray)
+        }
+        Text(
+            text = value.toString(),
+            color = Color.White,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }

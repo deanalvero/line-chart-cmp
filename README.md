@@ -1,7 +1,9 @@
 # Line Chart Compose Multiplatform
 
 ## Overview
-A Compose Multiplatform library for rendering a customizable line chart.
+A Compose Multiplatform library for rendering a customizable line chart. With this library, line charts from across iOS, Android, Desktop, and Web builds of your app will be the same.
+
+Try out the WASM build of the sample app at https://deanalvero.github.io/line-chart-cmp/.
 
 ## Dependency
 Add the dependency to your build.gradle. Replace version with what is available [here](https://central.sonatype.com/artifact/io.github.deanalvero/line-chart-cmp/versions).

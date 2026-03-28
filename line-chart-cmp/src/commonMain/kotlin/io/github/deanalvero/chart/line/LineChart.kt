@@ -35,7 +35,6 @@ import io.github.deanalvero.chart.line.transformer.DataTransformer
 import io.github.deanalvero.chart.line.utils.calculateBounds
 import io.github.deanalvero.chart.line.utils.calculateMarkerOffset
 import io.github.deanalvero.chart.line.utils.drawGridLines
-import io.github.deanalvero.chart.line.utils.drawLineSeries
 import io.github.deanalvero.chart.line.utils.drawLineSeriesList
 import io.github.deanalvero.chart.line.utils.drawXAxis
 import io.github.deanalvero.chart.line.utils.drawYAxis
@@ -70,8 +69,8 @@ fun LineChart(
 
     BoxWithConstraints(modifier) {
         val paddingPx = with(density) { chartPadding.toPx() }
-        val leftPadding = if (yAxis != null && yAxis.labelPosition == YAxisPosition.Left) paddingPx * 3 else paddingPx
-        val rightPadding = if (yAxis != null && yAxis.labelPosition == YAxisPosition.Right) paddingPx * 3 else paddingPx
+        val leftPadding = if (yAxis != null && yAxis.labelPosition == YAxisPosition.Left) paddingPx * 2 else paddingPx
+        val rightPadding = if (yAxis != null && yAxis.labelPosition == YAxisPosition.Right) paddingPx * 2 else paddingPx
         val topPadding = if (xAxis != null && xAxis.labelPosition == XAxisPosition.Top) paddingPx * 2 else paddingPx
         val bottomPadding = if (xAxis != null && xAxis.labelPosition == XAxisPosition.Bottom) paddingPx * 2 else paddingPx
 

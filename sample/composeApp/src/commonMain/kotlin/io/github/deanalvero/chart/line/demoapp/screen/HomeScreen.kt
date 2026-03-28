@@ -38,16 +38,10 @@ fun HomeScreen(onNavigate: (Screen) -> Unit) {
     ) {
         item {
             Text(
-                "LineChart Library Examples",
+                "Examples",
                 style = MaterialTheme.typography.headlineMedium,
                 color = Color.White,
                 modifier = Modifier.padding(bottom = 8.dp)
-            )
-            Text(
-                "Tap any example to explore",
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.Gray,
-                modifier = Modifier.padding(bottom = 16.dp)
             )
         }
 

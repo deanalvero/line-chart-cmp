@@ -1,7 +1,7 @@
 package io.github.deanalvero.chart.line.demoapp.screen
 
 sealed class Screen(val route: String, val title: String) {
-    data object Home : Screen("home", "Chart Examples")
+    data object Home : Screen("home", "Line Chart Compose Multiplatform")
     data object BasicChart : Screen("basic", "Basic Line Chart")
     data object MultiLine : Screen("multi", "Multi-Line Chart")
     data object StyledChart : Screen("styled_stacked_multi", "Styled Stacked Multi-Line Chart")
